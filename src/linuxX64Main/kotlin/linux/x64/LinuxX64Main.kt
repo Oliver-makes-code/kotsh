@@ -30,15 +30,14 @@ fun enableFlags() {
 
 fun signalHandle(code: Int) {
     println()
-//    println("${Ansi.bold}${Ansi.brightRed}Received signal: $code${Ansi.reset}")
-    println(with(Ansi) { this {
-        append(builder {
+    println(
+        Ansi.builder {
             +bold
             +brightRed
             +"Received signal: $code"
             +reset
-        })
-    }})
+        }
+    )
     enableFlags()
     exit(127)
 }
@@ -138,17 +137,15 @@ fun main() {
             }
             '"' -> {
                 print(byte.toInt().toChar())
+                currentLine.add(byte)
                 if (!quoted)
                     doubleQuoted = !doubleQuoted
-                else
-                    currentLine.add(byte)
             }
             '\'' -> {
                 print(byte.toInt().toChar())
+                currentLine.add(byte)
                 if (!doubleQuoted)
                     quoted = !quoted
-                else
-                    currentLine.add(byte)
             }
             else -> {
                 backslash = false

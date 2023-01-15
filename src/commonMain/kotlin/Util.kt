@@ -50,7 +50,7 @@ fun tokenize(input: String): List<String> {
             }
             '"' -> {
                 if (!quoted)
-                doubleQuoted = !doubleQuoted
+                    doubleQuoted = !doubleQuoted
                 else
                     output += currString
             }
@@ -62,11 +62,6 @@ fun tokenize(input: String): List<String> {
             }
             '\\' -> {
                 backslash = true
-            }
-            '\n' -> {
-                if (quoted || doubleQuoted)
-                    output += currString
-                else break
             }
             else -> {
                 currString += char
