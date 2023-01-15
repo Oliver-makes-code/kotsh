@@ -6,7 +6,7 @@ import platform.posix.stdin
 
 /*
  * hours wasted waiting for linker:
- * 2
+ * 134
  */
 fun main() {
     if (isatty(fileno(stdin)) != 0) {

@@ -25,4 +25,55 @@ val PATH = getEnvironmentVariable("PATH")?.split(pathSeparator()) ?: emptyList()
 /**
  * Run a modulo operation on a number, but return a positive result.
  */
-infix fun Int.mod(other: Int) = (this % other + other) % other
+infix fun Int.posMod(other: Int) = (this % other + other) % other
+
+fun tokenize(input: String): List<String> {
+    val output = arrayListOf<String>()
+
+    var currString = ""
+    var backslash = false
+    var quoted = false
+    var doubleQuoted = false
+    for (char in input) {
+        if (backslash) {
+            if (char != '\n') currString += char
+            continue
+        }
+        when (char) {
+            ' ' -> {
+                if (quoted || doubleQuoted) {
+                    currString += char
+                } else {
+                    output += currString
+                    currString = ""
+                }
+            }
+            '"' -> {
+                if (!quoted)
+                doubleQuoted = !doubleQuoted
+                else
+                    output += currString
+            }
+            '\'' -> {
+                if (!doubleQuoted)
+                    quoted = !quoted
+                else
+                    output += currString
+            }
+            '\\' -> {
+                backslash = true
+            }
+            '\n' -> {
+                if (quoted || doubleQuoted)
+                    output += currString
+                else break
+            }
+            else -> {
+                currString += char
+            }
+        }
+    }
+    output += currString
+
+    return output
+}
