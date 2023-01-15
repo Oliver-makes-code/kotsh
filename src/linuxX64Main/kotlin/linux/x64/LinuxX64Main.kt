@@ -1,9 +1,7 @@
 package de.olivermakesco.kotsh.linux.x64
 
-import kotlinx.cinterop.alloc
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.ptr
-import kotlinx.cinterop.readBytes
+import de.olivermakesco.kotsh.common.mod
+import kotlinx.cinterop.*
 import platform.posix.*
 
 val LFLAGS_TO_DISABLE = listOf(
@@ -11,7 +9,6 @@ val LFLAGS_TO_DISABLE = listOf(
     ECHO,
 ).map { it.toUInt().inv() }.reduce { acc, i -> acc and i }
 
-// kt/n is a mess ngl
 fun main() {
     if (isatty(fileno(stdin)) != 0) {
         println("stdin is a tty") // result when running directly from terminal
@@ -19,11 +16,8 @@ fun main() {
         println("stdin is not a tty") // result when running via gradle
     }
 
-    // what the fuck is going on
     memScoped {
         val termios = alloc<termios>()
-        // trading card game extra terrestrial attribute
-        // :iea:
         tcgetattr(fileno(stdin), termios.ptr)
         termios.c_lflag = termios.c_lflag and LFLAGS_TO_DISABLE
         tcsetattr(fileno(stdin), TCSANOW, termios.ptr)
@@ -38,37 +32,54 @@ fun main() {
         "test",
     )
 
-    // oh god unsafe code
     val singleByteArray = malloc(1)!!
-    val input = mutableListOf<UByte>()
+    val currentLine = mutableListOf<UByte>()
+    val lines = mutableListOf<List<UByte>>()
     var currentItem = 0
+    var mostRecentlyTabbed = false
     while (true) {
         read(fileno(stdin), singleByteArray, 1)
         val byte = singleByteArray.readBytes(1)[0].toUByte()
         when (byte.toInt().toChar()) {
             '\u0004' -> break // ctrl+d
             '\t' -> {
-                print("\u001b[2K\r") // clear line
-                val item = exampleList[currentItem]
-                print(exampleList[currentItem++]) // print item
-                currentItem %= exampleList.size // wrap around
-                input.clear() // clear input
-                input.addAll(item.map { it.code.toUByte() }) // add item to input
+                if (mostRecentlyTabbed) {
+                    val shiftPressed = false //TODO
+                    val prevItem = exampleList[currentItem]
+                    currentItem = (currentItem + if (shiftPressed) -1 else 1) mod exampleList.size
+                    repeat(prevItem.length) {
+                        currentLine.removeLast()
+                        print("\b \b")
+                    }
+                } else {
+                    currentItem = 0
+                }
+                mostRecentlyTabbed = true
+
+                currentLine.addAll(exampleList[currentItem].map { it.code.toUByte() })
+                print(exampleList[currentItem])
             }
             '\u0008', '\u007f' -> {
-                if (input.isNotEmpty()) {
-                    print("\u001b[1D") // move cursor left
-                    print("\u001b[2K\r") // clear line
-                    print(input.dropLast(1).map { it.toInt().toChar() }.joinToString("")) // print input
-                    input.removeLast() // remove last char
+                mostRecentlyTabbed = false
+                if (currentLine.isNotEmpty()) {
+                    currentLine.removeLast()
+                    print("\b \b")
+                    print(currentLine.dropLast(1).map { it.toInt().toChar() }.joinToString("")) // print input
                 }
             }
+            '\n' -> {
+                mostRecentlyTabbed = false
+                lines.add(currentLine.map { it }) // copy
+                currentLine.clear()
+                println()
+            }
             else -> {
-                input.add(byte)
+                mostRecentlyTabbed = false
+                currentLine.add(byte)
                 print(byte.toInt().toChar())
             }
         }
     }
-    println(input)
-    println("(the input was: ${input.map { it.toInt().toChar() }.joinToString("").trimEnd()})")
+    lines.add(currentLine) // final line
+    println(lines)
 }

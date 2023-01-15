@@ -8,9 +8,6 @@ import platform.posix.stdin
  * hours wasted waiting for linker:
  * 2
  */
-// ok so how do we use stdin to read chars
-// stdin is a c pointer how tf do we use that in kotlin
-// *magic*
 fun main() {
     if (isatty(fileno(stdin)) != 0) {
         println("stdin is a tty") // result when running directly from terminal
