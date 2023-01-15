@@ -21,4 +21,11 @@ kotlin {
             }
         }
     }
+    mingwX64 {
+        binaries {
+            executable {
+                entryPoint = "de.olivermakesco.kotsh.windows.x64.main"
+            }
+        }
+    }
 }

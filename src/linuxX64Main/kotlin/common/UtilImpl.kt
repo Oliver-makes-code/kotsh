@@ -1,3 +1,3 @@
 package de.olivermakesco.kotsh.common
 
-actual val PATH_SEPERATOR: String = ":"
+actual val PATH_SEPARATOR: String = ":"
