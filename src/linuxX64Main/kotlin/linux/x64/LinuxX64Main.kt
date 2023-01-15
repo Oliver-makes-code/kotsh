@@ -104,8 +104,7 @@ fun main() {
                 mostRecentlyTabbed = false
                 if (currentLine.isNotEmpty()) {
                     currentLine.removeLast()
-                    print("\b \b")
-                    print(currentLine.dropLast(1).buildString()) // print input
+                    print(Ansi.back(currentLine.size + 1)+currentLine.buildString() + " ${Ansi.back}") // print input
                 }
             }
             '\\' -> {
@@ -123,10 +122,8 @@ fun main() {
                 mostRecentlyTabbed = false
                 if (!backslash && !quoted && !doubleQuoted) {
                     lines.add(currentLine.map { it }) // copy
-                    val line = currentLine.buildString()
                     currentLine.clear()
                     println()
-                    println(tokenize(line))
                 } else {
                     backslash = false
                     currentLine.add(byte)
@@ -152,31 +149,6 @@ fun main() {
                 mostRecentlyTabbed = false
                 currentLine.add(byte)
                 print(byte.toInt().toChar())
-            }
-        }
-    }
-    lines.add(currentLine) // final line
-    println(lines)
-
-    print("Would you like to print the lines as readable text? [y/${Ansi.bold}N${Ansi.boldOff}] ")
-    while (true) {
-        read(fileno(stdin), singleByteArray, 1)
-        val byte = singleByteArray.readBytes(1)[0].toUByte()
-        when (byte.toInt().toChar()) {
-            'y', 'Y' -> {
-                println(with(Ansi) { "${brightBlue}Yes${reset}" })
-                lines.forEach { line ->
-                    println(line.buildString())
-                }
-                break
-            }
-            'n', 'N', '\n' -> {
-                println(with(Ansi) { "${brightBlue}No${reset}" })
-                break
-            }
-            '\u0004' -> {
-                println(with(Ansi) { "${brightRed}${bold}Aborted${reset}" })
-                break
             }
         }
     }

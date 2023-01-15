@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.config.LanguageFeature
-
 plugins {
     kotlin("multiplatform") version "1.8.0"
 }
