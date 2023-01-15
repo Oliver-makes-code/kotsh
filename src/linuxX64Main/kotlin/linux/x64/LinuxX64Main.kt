@@ -28,28 +28,31 @@ fun enableFlags() {
     }
 }
 
+val currentLine = mutableListOf<UByte>()
+
 fun signalHandle(code: Int) {
     println()
-    println(
-        Ansi.builder {
-            +bold
-            +brightRed
-            +"Received signal: $code"
-            +reset
+    when (code) {
+        2 -> {
+            currentLine.clear()
         }
-    )
-    enableFlags()
-    exit(127)
+        else -> {
+            println(
+                Ansi.builder {
+                    +bold
+                    +brightRed
+                    +"Received signal: $code"
+                    +reset
+                }
+            )
+            enableFlags()
+            exit(127)
+        }
+    }
 }
 
 fun main() {
     signal(SIGINT, staticCFunction(::signalHandle))
-
-    if (isatty(fileno(stdin)) != 0) {
-        println("stdin is a tty") // result when running directly from terminal
-    } else {
-        println("stdin is not a tty") // result when running via gradle
-    }
 
     disableFlags()
 
@@ -63,7 +66,6 @@ fun main() {
     )
 
     val singleByteArray = malloc(1)!!
-    val currentLine = mutableListOf<UByte>()
     val lines = mutableListOf<List<UByte>>()
     var currentItem = 0
     var mostRecentlyTabbed = false
@@ -99,7 +101,7 @@ fun main() {
                 currentLine.addAll(exampleList[currentItem].map { it.code.toUByte() })
                 print(exampleList[currentItem])
             }
-            '\u0008', '\u007f' -> {
+            '\u0008', '\u007f' -> { // Backspace
                 backslash = false
                 mostRecentlyTabbed = false
                 if (currentLine.isNotEmpty()) {
