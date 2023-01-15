@@ -18,6 +18,7 @@ kotlin {
         binaries {
             executable {
                 entryPoint = "de.olivermakesco.kotsh.linux.x64.main"
+                runTask!!.standardInput = System.`in`
             }
         }
     }
@@ -25,6 +26,7 @@ kotlin {
         binaries {
             executable {
                 entryPoint = "de.olivermakesco.kotsh.windows.x64.main"
+                runTask!!.standardInput = System.`in`
             }
         }
     }
