@@ -17,7 +17,7 @@ kotlin {
     linuxX64 {
         binaries {
             executable {
-                entryPoint = "olivermakesco.de.kotsh.linux.x64.main"
+                entryPoint = "de.olivermakesco.kotsh.linux.x64.main"
             }
         }
     }
