@@ -1,5 +1,7 @@
 package de.olivermakesco.kotsh.common
 
-expect val PATH_SEPARATOR: String
+expect fun pathSeparator(): String
 
 expect fun getEnvironmentVariable(name: String): String?
+
+val PATH = getEnvironmentVariable("PATH")?.split(pathSeparator()) ?: emptyList()
