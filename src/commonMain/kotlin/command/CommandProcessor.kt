@@ -1,5 +1,7 @@
 package de.olivermakesco.kotsh.common.command
 
+import de.olivermakesco.kotsh.common.command.builtin.CdCommand
+
 fun tokenize(input: String): List<String> {
     val output = arrayListOf<String>()
 
@@ -45,3 +47,17 @@ fun tokenize(input: String): List<String> {
 
     return output
 }
+
+fun processCommand(command: String, args: List<String>) {
+    when {
+        command == "cd" -> CdCommand(*args.toTypedArray())
+        command.isPath -> {
+            // TODO: Get the file at the path
+        }
+        else -> {
+            // TODO: Check PATH for locations
+        }
+    }
+}
+
+expect val String.isPath: Boolean
